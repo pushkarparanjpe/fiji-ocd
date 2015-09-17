@@ -54,7 +54,7 @@ def arrange():
 	
 	# the window is Fiji JFrame itself
 	x,y,w,h = SPECS[ type(IJ_FRAME) ]
-	IJ_FRAME.setLocation(SCREEN_WIDTH - IJ_WIDTH, 0)
+	IJ_FRAME.setLocation(x,y)
 	#
 	
 	niws = WM.getNonImageWindows()
