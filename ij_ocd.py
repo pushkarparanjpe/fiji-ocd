@@ -17,10 +17,12 @@ Since:
 from ij import IJ
 from ij import WindowManager as WM
 
-import fiji.scripting.TextEditor as FSTE
-import ij.plugin.frame.RoiManager as ROIM
-import ij.text.TextWindow as TW
-import ij.plugin.frame.Recorder as REC
+from ij import ImageJ
+from fiji.scripting import TextEditor
+from ij.plugin.frame import RoiManager
+from ij.text import TextWindow
+from ij.plugin.frame import Recorder
+
 
 
 
@@ -39,42 +41,32 @@ def arrange():
 	print SCREEN_WIDTH, SCREEN_HEIGHT
 	#
 	
+	SPECS = {
+	#	Format:
+	#	WINDOW : 	[x,	y,	w,	h]
+	#
+		ImageJ :		[SCREEN_WIDTH - IJ_WIDTH, 0, None, None],
+		TextEditor :	[SCREEN_WIDTH-640, SCREEN_HEIGHT-540, 640, 540],
+		RoiManager :	[0, 0, None, None],
+		TextWindow :	[0, SCREEN_HEIGHT-320, 480, 320],
+		Recorder :		[0, SCREEN_HEIGHT-320-120, 480, 320],
+	}
+	
 	# the window is Fiji JFrame itself
+	x,y,w,h = SPECS[ type(IJ_FRAME) ]
 	IJ_FRAME.setLocation(SCREEN_WIDTH - IJ_WIDTH, 0)
 	#
 	
 	niws = WM.getNonImageWindows()
 	print "%i non-image windows are open" % (len(niws))
 	for win in niws:
-		w = win.getWidth()
-		h = win.getHeight()
-		x = win.getX()
-		y = win.getY()
-		print w,h, x,y
 		print type(win)
-	
-		#IF the window is Fiji Scripting TextEditor
-		if type(win) == FSTE:
-			w, h = 640, 540
-			win.setSize(w, h)
-			win.setLocation(SCREEN_WIDTH - w, SCREEN_HEIGHT-h)
-	
-		#IF the window is ROI Manager
-		elif type(win) == ROIM:
-			win.setLocation(0, 0)
-	
-		#IF the window is Results Window
-		elif type(win) == TW and win.getTitle() == "Results":
-			w, h = 480, 320
-			win.setSize(w, h)
-			win.setLocation(0, SCREEN_HEIGHT-h)
-	
-		#IF the window is Recorder Window
-		elif type(win) == REC:
-			w, h = 480, 320
-			win.setSize(w, h)
-			win.setLocation(0, SCREEN_HEIGHT-h-120)
-	
-	
+		x, y, w, h = SPECS[ type(win) ]
+		if w == None:	w = win.getWidth()
+		if h == None:	h = win.getHeight()
+		win.setSize(w, h)
+		win.setLocation(x, y)
+
+
 if __name__=='__main__':
 	arrange()
